@@ -33,6 +33,7 @@ type Dict = {
   boardAria: string
   padAria: string
   language: string
+  digitKeyAria: (digit: number, remaining: number) => string
   currentLevel: (lv: Difficulty, name: string) => string
   difficulty: Record<Difficulty, string>
   confirmNewGame: string
@@ -77,6 +78,10 @@ const en: Dict = {
   boardAria: 'Sudoku board',
   padAria: 'Number pad',
   language: 'Language',
+  digitKeyAria: (digit, remaining) =>
+    remaining === 0
+      ? `Digit ${digit}, complete`
+      : `Digit ${digit}, ${remaining} remaining`,
   currentLevel: (lv, name) => `Level · LV${lv} ${name}`,
   difficulty: {
     1: 'Beginner',
@@ -132,6 +137,8 @@ const zhCN: Dict = {
   boardAria: '数独棋盘',
   padAria: '数字键盘',
   language: '语言',
+  digitKeyAria: (digit, remaining) =>
+    remaining === 0 ? `数字 ${digit}，已用完` : `数字 ${digit}，还剩 ${remaining} 个`,
   currentLevel: (lv, name) => `当前难度 · LV${lv} ${name}`,
   difficulty: {
     1: '入门',
@@ -187,6 +194,8 @@ const zhTW: Dict = {
   boardAria: '數獨棋盤',
   padAria: '數字鍵盤',
   language: '語言',
+  digitKeyAria: (digit, remaining) =>
+    remaining === 0 ? `數字 ${digit}，已用完` : `數字 ${digit}，還剩 ${remaining} 個`,
   currentLevel: (lv, name) => `目前難度 · LV${lv} ${name}`,
   difficulty: {
     1: '入門',

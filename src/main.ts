@@ -116,7 +116,13 @@ app.innerHTML = `
 
     <div class="pad" id="pad">
       ${[1, 2, 3, 4, 5, 6, 7, 8, 9]
-        .map((n) => `<button type="button" class="key" data-num="${n}">${n}</button>`)
+        .map(
+          (n) =>
+            `<button type="button" class="key" data-num="${n}">
+              <span class="key-digit">${n}</span>
+              <span class="key-remain" aria-hidden="true">9</span>
+            </button>`,
+        )
         .join('')}
       <button type="button" class="key key-erase" data-erase id="erase-btn"></button>
     </div>
@@ -258,6 +264,30 @@ function applyStaticI18n(): void {
   syncPencilButton()
   syncInstantCheckButton()
   syncLevelBadge()
+  syncPadCounts()
+}
+
+function remainingCounts(): number[] {
+  const used = Array(10).fill(0) as number[]
+  for (const v of state.board) {
+    if (v) used[v]!++
+  }
+  const rem = Array(10).fill(0) as number[]
+  for (let d = 1; d <= 9; d++) rem[d] = Math.max(0, 9 - used[d]!)
+  return rem
+}
+
+function syncPadCounts(): void {
+  const rem = remainingCounts()
+  const copy = t()
+  padEl.querySelectorAll<HTMLButtonElement>('button[data-num]').forEach((btn) => {
+    const digit = Number(btn.dataset.num)
+    const left = rem[digit] ?? 0
+    const badge = btn.querySelector<HTMLElement>('.key-remain')
+    if (badge) badge.textContent = String(left)
+    btn.classList.toggle('key-exhausted', left === 0)
+    btn.setAttribute('aria-label', copy.digitKeyAria(digit, left))
+  })
 }
 
 function refreshStatusForSelection(): void {
@@ -363,6 +393,7 @@ function render(): void {
   syncLevelBadge()
   syncPencilButton()
   syncInstantCheckButton()
+  syncPadCounts()
 }
 
 function selectCell(index: number): void {
