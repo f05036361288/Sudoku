@@ -320,14 +320,8 @@ body {
 
 .actions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-@media (min-width: 400px) {
-  .actions {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .btn {
@@ -346,6 +340,12 @@ body {
   touch-action: manipulation;
 }
 
+.actions .btn {
+  min-height: 42px;
+  border-radius: 10px;
+  font-size: 0.62rem;
+}
+
 .btn-icon {
   display: flex;
   flex-direction: column;
@@ -356,10 +356,20 @@ body {
   line-height: 1.15;
 }
 
+.actions .btn-icon {
+  gap: 1px;
+  padding: 4px 2px;
+}
+
 .btn-svg {
   width: 22px;
   height: 22px;
   flex-shrink: 0;
+}
+
+.actions .btn-svg {
+  width: 18px;
+  height: 18px;
 }
 
 .btn-label {
@@ -369,6 +379,11 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 2px;
+}
+
+.actions .btn-label {
+  font-size: 0.62rem;
+  letter-spacing: -0.02em;
 }
 
 .btn:active {

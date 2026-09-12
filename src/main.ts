@@ -114,19 +114,6 @@ app.innerHTML = `
 
     <div class="board" id="board" role="grid"></div>
 
-    <div class="pad" id="pad">
-      ${[1, 2, 3, 4, 5, 6, 7, 8, 9]
-        .map(
-          (n) =>
-            `<button type="button" class="key" data-num="${n}">
-              <span class="key-digit">${n}</span>
-              <span class="key-remain" aria-hidden="true">9</span>
-            </button>`,
-        )
-        .join('')}
-      <button type="button" class="key key-erase" data-erase id="erase-btn"></button>
-    </div>
-
     <div class="actions">
       <button type="button" class="btn btn-secondary btn-icon" id="pencil-toggle" aria-pressed="false">
         <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -152,6 +139,19 @@ app.innerHTML = `
         </svg>
         <span class="btn-label" data-label="new"></span>
       </button>
+    </div>
+
+    <div class="pad" id="pad">
+      ${[1, 2, 3, 4, 5, 6, 7, 8, 9]
+        .map(
+          (n) =>
+            `<button type="button" class="key" data-num="${n}">
+              <span class="key-digit">${n}</span>
+              <span class="key-remain" aria-hidden="true">9</span>
+            </button>`,
+        )
+        .join('')}
+      <button type="button" class="key key-erase" data-erase id="erase-btn"></button>
     </div>
   </div>
 
@@ -217,6 +217,7 @@ function setBtnLabel(btn: HTMLButtonElement, text: string): void {
   const label = btn.querySelector<HTMLElement>('.btn-label')
   if (label) label.textContent = text
   else btn.textContent = text
+  btn.setAttribute('aria-label', text)
 }
 
 function syncPencilButton(): void {
