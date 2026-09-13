@@ -25,6 +25,7 @@ type Dict = {
   notesOn: string
   check: string
   checkOn: string
+  undo: string
   hint: string
   newGame: string
   pickDifficulty: string
@@ -59,6 +60,8 @@ type Dict = {
   hintUnavailable: string
   alreadyCorrect: (n: number) => string
   hintFilled: (n: number) => string
+  undone: string
+  nothingToUndo: string
   newGameStarted: (lv: Difficulty, name: string) => string
   cellAria: (row: number, col: number, value: number, notes: number[]) => string
 }
@@ -70,6 +73,7 @@ const en: Dict = {
   notesOn: 'Notes · On',
   check: 'Check',
   checkOn: 'Check · On',
+  undo: 'Undo',
   hint: 'Hint',
   newGame: 'New',
   pickDifficulty: 'Choose level',
@@ -113,6 +117,8 @@ const en: Dict = {
   hintUnavailable: 'Cannot hint this cell',
   alreadyCorrect: (n) => `Already correct: ${n}`,
   hintFilled: (n) => `Hint: ${n}`,
+  undone: 'Undone',
+  nothingToUndo: 'Nothing to undo',
   newGameStarted: (lv, name) => `New game · LV${lv} ${name}`,
   cellAria: (row, col, value, notes) => {
     const base = `Row ${row}, column ${col}`
@@ -129,6 +135,7 @@ const zhCN: Dict = {
   notesOn: '笔记 · 开',
   check: '校对',
   checkOn: '校对 · 开',
+  undo: '撤销',
   hint: '提示',
   newGame: '新游戏',
   pickDifficulty: '选择难度',
@@ -170,6 +177,8 @@ const zhCN: Dict = {
   hintUnavailable: '无法提示这一格',
   alreadyCorrect: (n) => `已经是正确答案 ${n}`,
   hintFilled: (n) => `提示：${n}`,
+  undone: '已撤销',
+  nothingToUndo: '没有可撤销的步骤',
   newGameStarted: (lv, name) => `新游戏 · LV${lv} ${name}`,
   cellAria: (row, col, value, notes) => {
     const base = `第${row}行第${col}列`
@@ -186,6 +195,7 @@ const zhTW: Dict = {
   notesOn: '筆記 · 開',
   check: '校對',
   checkOn: '校對 · 開',
+  undo: '撤銷',
   hint: '提示',
   newGame: '新遊戲',
   pickDifficulty: '選擇難度',
@@ -227,6 +237,8 @@ const zhTW: Dict = {
   hintUnavailable: '無法提示這一格',
   alreadyCorrect: (n) => `已經是正確答案 ${n}`,
   hintFilled: (n) => `提示：${n}`,
+  undone: '已撤銷',
+  nothingToUndo: '沒有可撤銷的步驟',
   newGameStarted: (lv, name) => `新遊戲 · LV${lv} ${name}`,
   cellAria: (row, col, value, notes) => {
     const base = `第${row}行第${col}列`

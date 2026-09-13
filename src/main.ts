@@ -97,14 +97,22 @@ app.innerHTML = `
     <header class="top">
       <div class="top-row">
         <h1 id="title"></h1>
-        <div class="lang" id="lang">
-          <button type="button" class="lang-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false"></button>
-          <div class="lang-menu" id="lang-menu" role="listbox" hidden>
-            ${LOCALES.map(
-              (loc) =>
-                `<button type="button" class="lang-option" role="option" data-locale="${loc}">${LOCALE_LABEL[loc]}</button>`,
-            ).join('')}
+        <div class="top-tools">
+          <div class="lang" id="lang">
+            <button type="button" class="lang-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+            <div class="lang-menu" id="lang-menu" role="listbox" hidden>
+              ${LOCALES.map(
+                (loc) =>
+                  `<button type="button" class="lang-option" role="option" data-locale="${loc}">${LOCALE_LABEL[loc]}</button>`,
+              ).join('')}
+            </div>
           </div>
+          <button type="button" class="btn btn-secondary btn-icon top-new" id="new-game">
+            <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+            </svg>
+            <span class="btn-label" data-label="new"></span>
+          </button>
         </div>
       </div>
       <p class="status" id="status" aria-live="polite"></p>
@@ -115,29 +123,29 @@ app.innerHTML = `
     <div class="board" id="board" role="grid"></div>
 
     <div class="actions">
-      <button type="button" class="btn btn-secondary btn-icon" id="pencil-toggle" aria-pressed="false">
-        <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-        </svg>
-        <span class="btn-label" data-label="notes"></span>
-      </button>
       <button type="button" class="btn btn-secondary btn-icon" id="instant-check" aria-pressed="false">
         <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.1 14.2-3.7-3.7 1.4-1.4 2.3 2.3 5.1-5.1 1.4 1.4-6.5 6.5z"/>
         </svg>
         <span class="btn-label" data-label="check"></span>
       </button>
+      <button type="button" class="btn btn-secondary btn-icon" id="undo" disabled>
+        <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12.5 8c-2.65 0-5.05 1.02-6.85 2.69L3 8v7h7l-2.49-2.49C8.86 11.07 10.58 10 12.5 10c3.03 0 5.61 2.01 6.49 4.78l1.94-.63C19.88 10.92 16.53 8 12.5 8z"/>
+        </svg>
+        <span class="btn-label" data-label="undo"></span>
+      </button>
+      <button type="button" class="btn btn-secondary btn-icon" id="pencil-toggle" aria-pressed="false">
+        <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm14.71-9.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+        </svg>
+        <span class="btn-label" data-label="notes"></span>
+      </button>
       <button type="button" class="btn btn-secondary btn-icon" id="hint">
         <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="currentColor" d="M9 21h6v-1.5H9V21zm3-19a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zm2.5 12.2-.5.3V15.5h-4v-1l-.5-.3A5 5 0 1 1 14.5 14.2z"/>
         </svg>
         <span class="btn-label" data-label="hint"></span>
-      </button>
-      <button type="button" class="btn btn-icon" id="new-game">
-        <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-        </svg>
-        <span class="btn-label" data-label="new"></span>
       </button>
     </div>
 
@@ -182,6 +190,7 @@ const eraseBtn = document.querySelector<HTMLButtonElement>('#erase-btn')!
 const newGameBtn = document.querySelector<HTMLButtonElement>('#new-game')!
 const pencilBtn = document.querySelector<HTMLButtonElement>('#pencil-toggle')!
 const instantCheckBtn = document.querySelector<HTMLButtonElement>('#instant-check')!
+const undoBtn = document.querySelector<HTMLButtonElement>('#undo')!
 const hintBtn = document.querySelector<HTMLButtonElement>('#hint')!
 const lvModal = document.querySelector<HTMLDivElement>('#lv-modal')!
 const lvModalTitle = document.querySelector<HTMLHeadingElement>('#lv-modal-title')!
@@ -191,6 +200,49 @@ const padEl = document.querySelector<HTMLDivElement>('#pad')!
 const langBtn = document.querySelector<HTMLButtonElement>('#lang-btn')!
 const langMenu = document.querySelector<HTMLDivElement>('#lang-menu')!
 const langRoot = document.querySelector<HTMLDivElement>('#lang')!
+
+type HistoryEntry = { board: Board; notes: Notes }
+
+const MAX_HISTORY = 50
+const history: HistoryEntry[] = []
+
+function cloneNotes(notes: Notes): Notes {
+  return notes.map((cell) => cell.slice())
+}
+
+function pushHistory(): void {
+  history.push({
+    board: cloneBoard(state.board),
+    notes: cloneNotes(state.notes),
+  })
+  if (history.length > MAX_HISTORY) history.shift()
+  syncUndoButton()
+}
+
+function clearHistory(): void {
+  history.length = 0
+  syncUndoButton()
+}
+
+function undoMove(): void {
+  const prev = history.pop()
+  if (!prev) {
+    setStatus(t().nothingToUndo)
+    syncUndoButton()
+    return
+  }
+  state.board = prev.board
+  state.notes = prev.notes
+  persist()
+  setStatus(t().undone)
+  render()
+}
+
+function syncUndoButton(): void {
+  const copy = t()
+  setBtnLabel(undoBtn, copy.undo)
+  undoBtn.disabled = history.length === 0
+}
 
 function persist(): void {
   saveGame({
@@ -252,6 +304,7 @@ function applyStaticI18n(): void {
   eraseBtn.textContent = copy.erase
   setBtnLabel(hintBtn, copy.hint)
   setBtnLabel(newGameBtn, copy.newGame)
+  setBtnLabel(undoBtn, copy.undo)
   lvModalTitle.textContent = copy.pickDifficulty
   lvModalHint.textContent = copy.pickDifficultyHint
   lvModalCancel.textContent = copy.cancel
@@ -264,6 +317,7 @@ function applyStaticI18n(): void {
   syncLangButton()
   syncPencilButton()
   syncInstantCheckButton()
+  syncUndoButton()
   syncLevelBadge()
   syncPadCounts()
 }
@@ -394,6 +448,7 @@ function render(): void {
   syncLevelBadge()
   syncPencilButton()
   syncInstantCheckButton()
+  syncUndoButton()
   syncPadCounts()
 }
 
@@ -430,6 +485,7 @@ function toggleNote(num: number): void {
   }
 
   const i = state.selected
+  pushHistory()
   if (state.board[i]) {
     state.board[i] = 0
   }
@@ -458,6 +514,7 @@ function placeNumber(num: number): void {
   }
 
   const i = state.selected
+  pushHistory()
   state.board[i] = num
   state.notes[i] = []
   clearNoteDigitInPeers(i, num)
@@ -484,6 +541,7 @@ function applyHint(): void {
     setStatus(copy.alreadyCorrect(answer))
     return
   }
+  pushHistory()
   state.board[i] = answer
   state.notes[i] = []
   clearNoteDigitInPeers(i, answer)
@@ -510,9 +568,11 @@ function erase(): void {
   }
   const i = state.selected
   if (state.board[i]) {
+    pushHistory()
     state.board[i] = 0
     setStatus(copy.digitErased)
   } else if (state.notes[i]!.length) {
+    pushHistory()
     state.notes[i] = []
     setStatus(copy.notesCleared)
   } else {
@@ -546,6 +606,7 @@ function applyNewGame(difficulty: Difficulty): void {
     state.notes = next.notes
     state.solution = next.solution
     state.selected = null
+    clearHistory()
     clearSave()
     persist()
     setStatus(t().newGameStarted(difficulty, difficultyName(difficulty)))
@@ -618,6 +679,10 @@ instantCheckBtn.addEventListener('click', () => {
   toggleInstantCheck()
 })
 
+undoBtn.addEventListener('click', () => {
+  undoMove()
+})
+
 hintBtn.addEventListener('click', () => {
   applyHint()
 })
@@ -668,6 +733,11 @@ window.addEventListener('keydown', (e) => {
     return
   }
   if (e.target instanceof HTMLElement && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) {
+    return
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+    e.preventDefault()
+    undoMove()
     return
   }
   if (e.key === 'p' || e.key === 'P' || e.key === 'n' || e.key === 'N') {
