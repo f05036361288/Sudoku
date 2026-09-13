@@ -8,8 +8,11 @@ A lightweight Sudoku web app with live puzzle generation, notes, hints, and offl
 
 - **5 difficulty levels** — Beginner → Expert (unique-solution puzzles)
 - **Notes (pencil) mode** — mark candidates in a cell
+- **Remaining digit counts** — each number key shows how many of that digit are left
+- **Undo** — reverse fills, erases, notes, and hints (`Ctrl`/`Cmd`+`Z`)
 - **Instant check** — wrong entries highlight in red
 - **Hints** — fill the selected cell from the solution
+- **Same-digit highlight** — selecting a filled cell highlights matching digits and notes
 - **Auto-save** — progress restores in the same browser
 - **i18n** — English, 繁體中文, 简体中文
 - **PWA** — installable; updates automatically when a new build is deployed
