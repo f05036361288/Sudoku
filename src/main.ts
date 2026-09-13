@@ -97,28 +97,28 @@ app.innerHTML = `
     <header class="top">
       <div class="top-row">
         <h1 id="title"></h1>
-        <div class="top-tools">
-          <div class="lang" id="lang">
-            <button type="button" class="lang-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false"></button>
-            <div class="lang-menu" id="lang-menu" role="listbox" hidden>
-              ${LOCALES.map(
-                (loc) =>
-                  `<button type="button" class="lang-option" role="option" data-locale="${loc}">${LOCALE_LABEL[loc]}</button>`,
-              ).join('')}
-            </div>
+        <div class="lang" id="lang">
+          <button type="button" class="lang-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+          <div class="lang-menu" id="lang-menu" role="listbox" hidden>
+            ${LOCALES.map(
+              (loc) =>
+                `<button type="button" class="lang-option" role="option" data-locale="${loc}">${LOCALE_LABEL[loc]}</button>`,
+            ).join('')}
           </div>
-          <button type="button" class="btn btn-secondary btn-icon top-new" id="new-game">
-            <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-            </svg>
-            <span class="btn-label" data-label="new"></span>
-          </button>
         </div>
       </div>
       <p class="status" id="status" aria-live="polite"></p>
     </header>
 
-    <p class="level-badge" id="level-badge" aria-live="polite"></p>
+    <div class="level-row">
+      <p class="level-badge" id="level-badge" aria-live="polite"></p>
+      <button type="button" class="btn btn-secondary btn-icon top-new" id="new-game">
+        <svg class="btn-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+        </svg>
+        <span class="btn-label" data-label="new"></span>
+      </button>
+    </div>
 
     <div class="board" id="board" role="grid"></div>
 
