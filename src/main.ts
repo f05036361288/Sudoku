@@ -42,6 +42,7 @@ type State = {
   selected: number | null
   pencilMode: boolean
   instantCheck: boolean
+  won: boolean
   status: string
 }
 
@@ -66,6 +67,7 @@ function resolveSolution(given: Board, stored: Board | null): Board {
 function createInitialState(): State {
   const saved = loadSave()
   if (saved) {
+    const won = isCompleteAndValid(saved.board)
     return {
       difficulty: saved.difficulty,
       given: saved.given,
@@ -75,7 +77,10 @@ function createInitialState(): State {
       selected: null,
       pencilMode: false,
       instantCheck: saved.instantCheck,
-      status: t().restored(difficultyName(saved.difficulty)),
+      won,
+      status: won
+        ? t().completed(saved.difficulty, difficultyName(saved.difficulty))
+        : t().restored(difficultyName(saved.difficulty)),
     }
   }
   const difficulty: Difficulty = 2
@@ -84,6 +89,7 @@ function createInitialState(): State {
     selected: null,
     pencilMode: false,
     instantCheck: false,
+    won: false,
     status: t().selectCell,
   }
 }
@@ -180,6 +186,17 @@ app.innerHTML = `
       <button type="button" class="btn btn-secondary modal-cancel" data-close-modal id="lv-modal-cancel"></button>
     </div>
   </div>
+
+  <div class="modal" id="win-modal" hidden>
+    <div class="modal-backdrop" data-close-win></div>
+    <div class="modal-card win-card" role="dialog" aria-modal="true" aria-labelledby="win-title">
+      <p class="win-badge" aria-hidden="true">✓</p>
+      <h2 id="win-title"></h2>
+      <p class="modal-hint" id="win-body"></p>
+      <button type="button" class="btn" id="win-again"></button>
+      <button type="button" class="btn btn-secondary" data-close-win id="win-keep"></button>
+    </div>
+  </div>
 `
 
 const boardEl = document.querySelector<HTMLDivElement>('#board')!
@@ -196,6 +213,11 @@ const lvModal = document.querySelector<HTMLDivElement>('#lv-modal')!
 const lvModalTitle = document.querySelector<HTMLHeadingElement>('#lv-modal-title')!
 const lvModalHint = document.querySelector<HTMLParagraphElement>('#lv-modal-hint')!
 const lvModalCancel = document.querySelector<HTMLButtonElement>('#lv-modal-cancel')!
+const winModal = document.querySelector<HTMLDivElement>('#win-modal')!
+const winTitle = document.querySelector<HTMLHeadingElement>('#win-title')!
+const winBody = document.querySelector<HTMLParagraphElement>('#win-body')!
+const winAgainBtn = document.querySelector<HTMLButtonElement>('#win-again')!
+const winKeepBtn = document.querySelector<HTMLButtonElement>('#win-keep')!
 const padEl = document.querySelector<HTMLDivElement>('#pad')!
 const langBtn = document.querySelector<HTMLButtonElement>('#lang-btn')!
 const langMenu = document.querySelector<HTMLDivElement>('#lang-menu')!
@@ -233,6 +255,10 @@ function undoMove(): void {
   }
   state.board = prev.board
   state.notes = prev.notes
+  if (state.won && !isCompleteAndValid(state.board)) {
+    state.won = false
+    closeWinModal()
+  }
   persist()
   setStatus(t().undone)
   render()
@@ -308,6 +334,14 @@ function applyStaticI18n(): void {
   lvModalTitle.textContent = copy.pickDifficulty
   lvModalHint.textContent = copy.pickDifficultyHint
   lvModalCancel.textContent = copy.cancel
+  winTitle.textContent = copy.winTitle
+  winAgainBtn.textContent = copy.playAgain
+  winKeepBtn.textContent = copy.keepPlaying
+  if (state.won) {
+    const d = state.difficulty
+    winBody.textContent = copy.winBody(d, difficultyName(d))
+    setStatus(copy.completed(d, difficultyName(d)))
+  }
   boardEl.setAttribute('aria-label', copy.boardAria)
   padEl.setAttribute('aria-label', copy.padAria)
   lvModal.querySelectorAll<HTMLElement>('[data-diff-name]').forEach((el) => {
@@ -346,6 +380,11 @@ function syncPadCounts(): void {
 }
 
 function refreshStatusForSelection(): void {
+  if (state.won) {
+    const d = state.difficulty
+    setStatus(t().completed(d, difficultyName(d)))
+    return
+  }
   if (state.selected === null) {
     setStatus(t().selectCell)
     return
@@ -383,8 +422,14 @@ function afterFill(index: number, statusOk: string): void {
   const copy = t()
   const d = state.difficulty
   if (isCompleteAndValid(state.board)) {
+    state.won = true
     setStatus(copy.completed(d, difficultyName(d)))
-  } else if (isWrongFill(index)) {
+    render()
+    openWinModal()
+    return
+  }
+  state.won = false
+  if (isWrongFill(index)) {
     setStatus(copy.wrong)
   } else if (findConflicts(state.board).has(index)) {
     setStatus(copy.conflict)
@@ -447,6 +492,7 @@ function render(): void {
   }
 
   statusEl.textContent = state.status
+  boardEl.classList.toggle('completed', state.won)
   syncLevelBadge()
   syncPencilButton()
   syncInstantCheckButton()
@@ -456,7 +502,10 @@ function render(): void {
 
 function selectCell(index: number): void {
   state.selected = index
-  if (state.given[index]) {
+  if (state.won) {
+    const d = state.difficulty
+    setStatus(t().completed(d, difficultyName(d)))
+  } else if (state.given[index]) {
     setStatus(t().givenLocked)
   } else if (state.pencilMode) {
     setStatus(t().notesModeHint)
@@ -581,6 +630,10 @@ function erase(): void {
     setStatus(copy.cellEmpty)
     return
   }
+  if (state.won && !isCompleteAndValid(state.board)) {
+    state.won = false
+    closeWinModal()
+  }
   persist()
   render()
 }
@@ -600,6 +653,7 @@ function toggleInstantCheck(): void {
 
 function applyNewGame(difficulty: Difficulty): void {
   setStatus(t().generating)
+  closeWinModal()
   requestAnimationFrame(() => {
     const next = startPuzzle(difficulty)
     state.difficulty = next.difficulty
@@ -608,6 +662,7 @@ function applyNewGame(difficulty: Difficulty): void {
     state.notes = next.notes
     state.solution = next.solution
     state.selected = null
+    state.won = false
     clearHistory()
     clearSave()
     persist()
@@ -628,8 +683,22 @@ function closeLevelPicker(): void {
   lvModal.hidden = true
 }
 
+function openWinModal(): void {
+  const copy = t()
+  const d = state.difficulty
+  winTitle.textContent = copy.winTitle
+  winBody.textContent = copy.winBody(d, difficultyName(d))
+  winAgainBtn.textContent = copy.playAgain
+  winKeepBtn.textContent = copy.keepPlaying
+  winModal.hidden = false
+}
+
+function closeWinModal(): void {
+  winModal.hidden = true
+}
+
 function requestNewGame(): void {
-  if (!confirm(t().confirmNewGame)) return
+  if (!state.won && !confirm(t().confirmNewGame)) return
   openLevelPicker()
 }
 
@@ -723,10 +792,28 @@ lvModal.addEventListener('click', (e) => {
   applyNewGame(lv)
 })
 
+winModal.addEventListener('click', (e) => {
+  const target = e.target as HTMLElement
+  if (target.closest('[data-close-win]')) {
+    closeWinModal()
+    return
+  }
+})
+
+winAgainBtn.addEventListener('click', () => {
+  closeWinModal()
+  openLevelPicker()
+})
+
 window.addEventListener('keydown', (e) => {
   if (!langMenu.hidden && e.key === 'Escape') {
     e.preventDefault()
     closeLangMenu()
+    return
+  }
+  if (!winModal.hidden && e.key === 'Escape') {
+    e.preventDefault()
+    closeWinModal()
     return
   }
   if (!lvModal.hidden && e.key === 'Escape') {

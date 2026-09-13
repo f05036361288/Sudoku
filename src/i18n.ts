@@ -48,6 +48,10 @@ type Dict = {
   wrong: string
   conflict: string
   completed: (lv: Difficulty, name: string) => string
+  winTitle: string
+  winBody: (lv: Difficulty, name: string) => string
+  playAgain: string
+  keepPlaying: string
   noteAdded: (n: number) => string
   noteRemoved: (n: number) => string
   notesCleared: string
@@ -105,6 +109,10 @@ const en: Dict = {
   wrong: 'Incorrect',
   conflict: 'Conflict — check again',
   completed: (lv, name) => `Completed! · LV${lv} ${name}`,
+  winTitle: 'Puzzle complete!',
+  winBody: (lv, name) => `Nice work — you finished LV${lv} ${name}.`,
+  playAgain: 'Play again',
+  keepPlaying: 'Keep looking',
   noteAdded: (n) => `Note added ${n}`,
   noteRemoved: (n) => `Note removed ${n}`,
   notesCleared: 'Notes cleared',
@@ -165,6 +173,10 @@ const zhCN: Dict = {
   wrong: '填错了',
   conflict: '有冲突，再检查一下',
   completed: (lv, name) => `完成！· LV${lv} ${name}`,
+  winTitle: '恭喜通关！',
+  winBody: (lv, name) => `太棒了，你完成了 LV${lv} ${name}。`,
+  playAgain: '再来一局',
+  keepPlaying: '继续查看',
   noteAdded: (n) => `已标记笔记 ${n}`,
   noteRemoved: (n) => `已取消笔记 ${n}`,
   notesCleared: '已清除笔记',
@@ -225,6 +237,10 @@ const zhTW: Dict = {
   wrong: '填錯了',
   conflict: '有衝突，再檢查一下',
   completed: (lv, name) => `完成！· LV${lv} ${name}`,
+  winTitle: '恭喜過關！',
+  winBody: (lv, name) => `太棒了，你完成了 LV${lv} ${name}。`,
+  playAgain: '再來一局',
+  keepPlaying: '繼續查看',
   noteAdded: (n) => `已標記筆記 ${n}`,
   noteRemoved: (n) => `已取消筆記 ${n}`,
   notesCleared: '已清除筆記',
