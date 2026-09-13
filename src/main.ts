@@ -366,11 +366,13 @@ function isWrongFill(index: number): boolean {
   return value !== 0 && value !== state.solution[index]
 }
 
-function notesMarkup(cellNotes: number[]): string {
+function notesMarkup(cellNotes: number[], highlightDigit = 0): string {
   const cells = Array.from({ length: 9 }, (_, i) => {
     const n = i + 1
-    return `<span class="note${cellNotes.includes(n) ? ' on' : ''}">${
-      cellNotes.includes(n) ? n : ''
+    const on = cellNotes.includes(n)
+    const match = on && highlightDigit === n
+    return `<span class="note${on ? ' on' : ''}${match ? ' match' : ''}">${
+      on ? n : ''
     }</span>`
   })
   return `<span class="notes">${cells.join('')}</span>`
@@ -432,7 +434,7 @@ function render(): void {
     if (value) {
       btn.textContent = String(value)
     } else if (cellNotes.length) {
-      btn.innerHTML = notesMarkup(cellNotes)
+      btn.innerHTML = notesMarkup(cellNotes, selectedValue || 0)
     } else {
       btn.textContent = ''
     }
