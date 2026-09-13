@@ -13,9 +13,11 @@ A lightweight Sudoku web app with live puzzle generation, notes, hints, and offl
 - **Instant check** — wrong entries highlight in red
 - **Hints** — fill the selected cell from the solution
 - **Same-digit highlight** — selecting a filled cell highlights matching digits and notes
+- **Win modal** — celebration dialog when the puzzle is complete, with play-again
 - **Auto-save** — progress restores in the same browser
 - **i18n** — English, 繁體中文, 简体中文
 - **PWA** — installable; updates automatically when a new build is deployed
+- **Mobile-friendly** — compact action bar, touch targets, safe-area padding
 
 ## Tech stack
 
